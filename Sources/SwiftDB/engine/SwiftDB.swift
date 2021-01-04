@@ -12,6 +12,7 @@ class SwiftDB {
     private var databaseName: String?
     private var meta: [String: SwiftDBModel.Type] = [:]
     private var content: [String: [Codable]] = [:]
+    private var autoIncrementIndex: [String: Int] = [:]
     
     func createDatabase(name: String) {
         self.databaseName = name
@@ -24,16 +25,19 @@ class SwiftDB {
     func createTable<T: SwiftDBModel>(name: String, template: T.Type) {
         self.meta[name] = template
         self.content[name] = []
+        self.autoIncrementIndex[name] = 0
         print("Created new table \(name) for storing \(template) objects")
     }
     
     func dropTable(name: String) {
         self.meta[name] = nil
         self.content[name] = nil
+        self.autoIncrementIndex[name] = nil
     }
     
     func truncateTable(name: String) {
         self.content[name] = nil
+        self.autoIncrementIndex[name] = 0
     }
     
     func insert<T: SwiftDBModel>(object: T, into tableName: String) throws {
@@ -43,5 +47,10 @@ class SwiftDB {
         guard T.self == expectedModel else {
             throw SwiftDBError.invalidObjectType(given: T.self, expected: expectedModel)
         }
+        
+        let nextIndex = (self.autoIncrementIndex[tableName] ?? 0) + 1
+        
+        
+        self.autoIncrementIndex[tableName] = nextIndex
     }
 }
