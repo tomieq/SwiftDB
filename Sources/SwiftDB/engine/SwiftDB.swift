@@ -24,7 +24,7 @@ class SwiftDB {
     func createTable<T: SwiftDBModel>(name: String, template: T.Type) {
         self.meta[name] = template
         self.content[name] = []
-        print("Created new table \(self.meta[name])")
+        print("Created new table \(name) for storing \(template) objects")
     }
     
     func dropTable(name: String) {
@@ -38,12 +38,10 @@ class SwiftDB {
     
     func insert<T: SwiftDBModel>(object: T, into tableName: String) throws {
         guard let expectedModel = self.meta[tableName] else {
-            return
+            throw SwiftDBError.tableNotExists(name: tableName)
         }
         guard T.self == expectedModel else {
-            print("Expected type for table \(tableName) is \(expectedModel) but \(T.self) given")
-            return
+            throw SwiftDBError.invalidObjectType(given: T.self, expected: expectedModel)
         }
-        //print("coherency=\(object is expectedModel)")
     }
 }
