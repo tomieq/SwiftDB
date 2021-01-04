@@ -22,4 +22,8 @@ class SwiftDBTable {
         self.content = []
         self.autoIncrementIndex = 1
     }
+    
+    func incrementIndex() {
+        self.autoIncrementIndex = self.autoIncrementIndex + 1
+    }
 }

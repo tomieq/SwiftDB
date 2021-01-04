@@ -46,6 +46,13 @@ class SwiftDB {
         guard T.self == expectedModel else {
             throw SwiftDBError.invalidObjectType(given: T.self, expected: expectedModel)
         }
+        
+        guard object.id == .none else {
+            throw SwiftDBError.invalidObjectState(info: "Inserted object cannot have set id")
+        }
         print("Inserted new data into \(tableName)")
+        
+        object.id = table.autoIncrementIndex
+        table.incrementIndex()
     }
 }

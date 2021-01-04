@@ -10,6 +10,7 @@ import Foundation
 enum SwiftDBError: Error {
     case tableNotExists(name: String)
     case invalidObjectType(given: SwiftDBModel.Type, expected: SwiftDBModel.Type)
+    case invalidObjectState(info: String)
 }
 
 extension SwiftDBError: LocalizedError {
@@ -19,6 +20,8 @@ extension SwiftDBError: LocalizedError {
             return "Table \(name) does not exists"
         case .invalidObjectType(let given, let expected):
             return "Expected type is \(expected) but \(given) given"
+        case .invalidObjectState(let info):
+            return info
         }
     }
 }

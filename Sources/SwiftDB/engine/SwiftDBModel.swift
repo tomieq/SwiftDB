@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol SwiftDBModel: Codable {
-    var id: Int? { get }
+protocol SwiftDBModel: class, Codable {
+    var id: Int? { get set }
 }
