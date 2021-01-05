@@ -146,4 +146,29 @@ class SwiftDBTests: XCTestCase {
         }
         
     }
+    
+    func testSelectQueryEquals() {
+        
+        let audi = Car()
+        audi.color = "black"
+        audi.fuelLevel = 50
+        
+        let mercedes = Car()
+        mercedes.color = "silver"
+        mercedes.fuelLevel = 90
+        
+        do {
+            let db = try SwiftDB(databaseName: "tests")
+            try db.createTable(name: "cars", dataType: Car.self)
+            try db.insert(object: audi, into: "cars")
+            try db.insert(object: mercedes, into: "cars")
+            
+            let cars: [Car] = try db.select(from: "cars", where: SwiftDBQuery.equals(columnName: "color", value: "silver"))
+            XCTAssertEqual(cars.count, 1)
+            XCTAssertNotNil(cars.first)
+            XCTAssertEqual("silver", cars.first?.color)
+        } catch {
+            XCTFail("Test should not throw")
+        }
+    }
 }
