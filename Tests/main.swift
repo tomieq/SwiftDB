@@ -105,4 +105,31 @@ class SwiftDBTests: XCTestCase {
             XCTFail("Test should not throw")
         }
     }
+    
+    func testComplexInsert() {
+        
+        let audi = Car()
+        audi.color = "black"
+        audi.fuelLevel = 50
+        
+        let mercedes = Car()
+        mercedes.color = "silver"
+        mercedes.fuelLevel = 90
+        
+        let garage = Garage()
+        garage.cars = [audi, mercedes]
+        
+        do {
+            let db = SwiftDB()
+            db.createDatabase(name: "tests")
+            db.createTable(name: "garages", dataType: Garage.self)
+            try db.insert(object: garage, into: "garages")
+            
+            let garages: [Garage] = try db.select(from: "garages")
+            let retrievedCars = garages.first?.cars ?? []
+            XCTAssertEqual(retrievedCars.count, 2)
+        } catch {
+            XCTFail("Test should not throw")
+        }
+    }
 }
