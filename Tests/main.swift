@@ -152,10 +152,12 @@ class SwiftDBTests: XCTestCase {
         let audi = Car()
         audi.color = "black"
         audi.fuelLevel = 50
+        audi.isOpen = false
         
         let mercedes = Car()
         mercedes.color = "silver"
         mercedes.fuelLevel = 90
+        mercedes.isOpen = true
         
         do {
             let db = try SwiftDB(databaseName: "tests")
@@ -163,10 +165,20 @@ class SwiftDBTests: XCTestCase {
             try db.insert(object: audi, into: "cars")
             try db.insert(object: mercedes, into: "cars")
             
-            let cars: [Car] = try db.select(from: "cars", where: SwiftDBQuery.equals(columnName: "color", value: "silver"))
+            var cars: [Car] = try db.select(from: "cars", where: SwiftDBQuery.equalsString(attribute: "color", value: "silver"))
             XCTAssertEqual(cars.count, 1)
             XCTAssertNotNil(cars.first)
             XCTAssertEqual("silver", cars.first?.color)
+            
+            cars = try db.select(from: "cars", where: SwiftDBQuery.equalsInt(attribute: "fuelLevel", value: 90))
+            XCTAssertEqual(cars.count, 1)
+            XCTAssertNotNil(cars.first)
+            XCTAssertEqual(90, cars.first?.fuelLevel)
+            
+            cars = try db.select(from: "cars", where: SwiftDBQuery.equalsBool(attribute: "isOpen", value: true))
+            XCTAssertEqual(cars.count, 1)
+            XCTAssertNotNil(cars.first)
+            XCTAssertEqual(true, cars.first?.isOpen)
         } catch {
             XCTFail("Test should not throw")
         }

@@ -23,8 +23,11 @@ class SwiftDBModelWrap {
             mirror?.children.forEach { child in
                 
                 if let label = child.label {
-                    let value = String(describing: self.unwrap(child.value))
-                    self.metaData.append(SwiftDBModelMetaData(name: label, value: value))
+                    let unwrappedSomeValue = self.unwrap(child.value)
+                    if    (unwrappedSomeValue is String || unwrappedSomeValue is Int || unwrappedSomeValue is Bool) {
+                        self.metaData.append(SwiftDBModelMetaData(name: label, value: unwrappedSomeValue))
+                        print("Added metadata \(label)=\(String(describing: unwrappedSomeValue))")
+                    }
                 }
             }
             mirror = mirror?.superclassMirror
@@ -43,5 +46,5 @@ class SwiftDBModelWrap {
 
 struct SwiftDBModelMetaData {
     let name: String
-    let value: String
+    let value: Any
 }

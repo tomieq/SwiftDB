@@ -13,6 +13,7 @@ class Car: SwiftDBModel {
     
     var color: String?
     var fuelLevel: Int?
+    var isOpen: Bool?
     
     required init() {
         self.uniqueID = UUID().uuidString

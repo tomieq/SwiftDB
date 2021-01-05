@@ -13,7 +13,9 @@ enum SwiftDBType {
 }
 
 enum SwiftDBQuery {
-    case equals(columnName: String, value: String)
+    case equalsString(attribute: String, value: String)
+    case equalsInt(attribute: String, value: Int)
+    case equalsBool(attribute: String, value: Bool)
     case or([SwiftDBQuery])
     case and([SwiftDBQuery])
 }
@@ -105,10 +107,28 @@ class SwiftDB {
         var wraps = table.content
         if let query = query {
             switch query {
-            case .equals(let columnName, let value):
+            case .equalsString(let attribute, let value):
                 wraps = wraps.filter { wrap in
-                    if let metaData = (wrap.metaData.filter { $0.name == columnName }.first) {
-                        if metaData.value == value {
+                    if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
+                        if let objectValue = metaData.value as? String, objectValue == value {
+                            return true
+                        }
+                    }
+                    return false
+                }
+            case .equalsInt(let attribute, let value):
+                wraps = wraps.filter { wrap in
+                    if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
+                        if let objectValue = metaData.value as? Int, objectValue == value {
+                            return true
+                        }
+                    }
+                    return false
+                }
+            case .equalsBool(let attribute, let value):
+                wraps = wraps.filter { wrap in
+                    if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
+                        if let objectValue = metaData.value as? Bool, objectValue == value {
                             return true
                         }
                     }
