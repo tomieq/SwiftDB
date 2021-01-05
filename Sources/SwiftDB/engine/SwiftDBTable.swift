@@ -10,7 +10,7 @@ import Foundation
 class SwiftDBTable {
     let name: String
     let dataType: String
-    var autoIncrementIndex: Int = 1
+    let columns: [SwiftDBModelColumn]
     var content: [SwiftDBModel] = []
     
     init(name: String, dataType: SwiftDBModel.Type) {
@@ -24,10 +24,5 @@ class SwiftDBTable {
     
     func truncate() {
         self.content = []
-        self.autoIncrementIndex = 1
-    }
-    
-    func incrementIndex() {
-        self.autoIncrementIndex = self.autoIncrementIndex + 1
     }
 }
