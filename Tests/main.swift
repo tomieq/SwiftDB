@@ -20,8 +20,7 @@ class SwiftDBTests: XCTestCase {
         car.fuelLevel = 50
         
         do {
-            let db = SwiftDB()
-            try db.createDatabase(name: "tests")
+            let db = try SwiftDB(databaseName: "tests")
             try db.createTable(name: "cars", dataType: Car.self)
             try db.insert(object: car, into: "cars")
             
@@ -38,8 +37,7 @@ class SwiftDBTests: XCTestCase {
         bus.doorAmount = 3
         
         do {
-            let db = SwiftDB()
-            try db.createDatabase(name: "tests")
+            let db = try SwiftDB(databaseName: "tests")
             try db.createTable(name: "buses", dataType: Car.self)
             try db.insert(object: bus, into: "buses")
             XCTFail("Test should throw because types are different")
@@ -64,8 +62,7 @@ class SwiftDBTests: XCTestCase {
         mercedes.fuelLevel = 90
         
         do {
-            let db = SwiftDB()
-            try db.createDatabase(name: "tests")
+            let db = try SwiftDB(databaseName: "tests")
             try db.createTable(name: "cars", dataType: Car.self)
             try db.insert(object: audi, into: "cars")
             try db.insert(object: mercedes, into: "cars")
@@ -88,8 +85,7 @@ class SwiftDBTests: XCTestCase {
         mercedes.fuelLevel = 90
         
         do {
-            let db = SwiftDB()
-            try db.createDatabase(name: "tests")
+            let db = try SwiftDB(databaseName: "tests")
             try db.createTable(name: "cars", dataType: Car.self)
             try db.insert(object: audi, into: "cars")
             try db.insert(object: mercedes, into: "cars")
@@ -120,8 +116,7 @@ class SwiftDBTests: XCTestCase {
         garage.cars = [audi, mercedes]
         
         do {
-            let db = SwiftDB()
-            try db.createDatabase(name: "tests")
+            let db = try SwiftDB(databaseName: "tests")
             try db.createTable(name: "garages", dataType: Garage.self)
             try db.insert(object: garage, into: "garages")
             
@@ -131,5 +126,24 @@ class SwiftDBTests: XCTestCase {
         } catch {
             XCTFail("Test should not throw")
         }
+    }
+    
+    func testPersistentStore() {
+        
+        let car = Car()
+        car.color = "red"
+        car.fuelLevel = 50
+        
+        do {
+            let db = try SwiftDB(.fileStorage(path: FileManager.default.currentDirectoryPath), databaseName: "tests")
+            try db.createTable(name: "cars", dataType: Car.self)
+            try db.insert(object: car, into: "cars")
+            
+            let retrievedCars: [Car] = try db.select(from: "cars")
+            XCTAssertEqual(retrievedCars.count, 1)
+        } catch {
+            XCTFail("Test should not throw")
+        }
+        
     }
 }

@@ -14,23 +14,20 @@ enum SwiftDBType {
 
 class SwiftDB {
 
-    private var databaseName: String?
-    private var type: SwiftDBType
+    private var databaseName: String
+    private var storageDriver: StorageDriver
     private var tables: [SwiftDBTable] = []
     
-    init(_ type: SwiftDBType = .memory) {
-        self.type = type
-    }
-    
-    func createDatabase(name: String) throws {
-        self.databaseName = name
-        self.tables = []
-    }
-    
-    func useDatabase(name: String) throws {
-        self.databaseName = name
-        // load tables into memory
-        self.tables = []
+    init(_ type: SwiftDBType = .memory, databaseName: String) throws {
+        
+        self.databaseName = databaseName
+        switch type {
+        case .memory:
+            self.storageDriver = MemoryStorageDriver()
+        case .fileStorage(let path):
+            try self.storageDriver = FileStorageDriver(databaseName: databaseName, path: path)
+        }
+        
     }
     
     private func getTable(named name: String) -> SwiftDBTable? {
@@ -38,25 +35,20 @@ class SwiftDB {
     }
     
     func createTable<T: SwiftDBModel>(name: String, dataType: T.Type) throws {
-        guard let _ = self.databaseName else {
-            throw SwiftDBError.databaseNotSelected
-        }
+
         let table = SwiftDBTable(name: name, dataType: dataType)
         self.tables.append(table)
         print("Created new table \(name) for storing \(dataType) objects with columns \(table.columns.debugDescription)")
+        try self.save(table: table, dataType: T.self)
     }
     
     func dropTable(name: String) throws {
-        guard let _ = self.databaseName else {
-            throw SwiftDBError.databaseNotSelected
-        }
+
         self.tables = self.tables.filter { $0.name != name }
     }
     
     func truncateTable(name: String) throws {
-        guard let _ = self.databaseName else {
-            throw SwiftDBError.databaseNotSelected
-        }
+
         guard let table = self.getTable(named: name) else {
             throw SwiftDBError.tableNotExists(name: name)
         }
@@ -64,9 +56,7 @@ class SwiftDB {
     }
     
     func insert<T: SwiftDBModel>(object: T, into tableName: String) throws {
-        guard let _ = self.databaseName else {
-            throw SwiftDBError.databaseNotSelected
-        }
+
         guard let table = self.getTable(named: tableName) else {
             throw SwiftDBError.tableNotExists(name: tableName)
         }
@@ -81,21 +71,11 @@ class SwiftDB {
         print("Inserted new data into \(tableName)")
         table.content.append(object)
         
-        let encoder = JSONEncoder()
-        if let encodable = table.content as? [T] {
-            do {
-                let data = try encoder.encode(encodable)
-                print("Encoded data=\(String(decoding: data, as: UTF8.self))")
-            } catch {
-                print("Encoder error \(error.localizedDescription)")
-            }
-        }
+        try self.save(table: table, dataType: T.self)
     }
     
     func delete<T: SwiftDBModel>(object: T, from tableName: String) throws {
-        guard let _ = self.databaseName else {
-            throw SwiftDBError.databaseNotSelected
-        }
+
         guard let table = self.getTable(named: tableName) else {
             throw SwiftDBError.tableNotExists(name: tableName)
         }
@@ -105,12 +85,11 @@ class SwiftDB {
         
         table.content = table.content.filter { $0.uniqueID != object.uniqueID }
         print("Deleted object from \(tableName) with uniqueID=\(object.uniqueID)")
+        try self.save(table: table, dataType: T.self)
     }
     
     func select<T: SwiftDBModel>(from tableName: String) throws -> [T]  {
-        guard let _ = self.databaseName else {
-            throw SwiftDBError.databaseNotSelected
-        }
+
         guard let table = self.getTable(named: tableName) else {
             throw SwiftDBError.tableNotExists(name: tableName)
         }
@@ -119,5 +98,9 @@ class SwiftDB {
         }
         return (table.content as? [T]) ?? []
         
+    }
+    
+    private func save<T: SwiftDBModel>(table: SwiftDBTable, dataType: T.Type) throws {
+        try self.storageDriver.save(table: table, dataType: dataType)
     }
 }
