@@ -49,7 +49,33 @@ class SwiftDB {
             throw SwiftDBError.invalidObjectType(givenType: T.self, expectedType: table.dataType)
         }
         
+        if table.objectExists(uniqueID: object.uniqueID, in: tableName) {
+            throw SwiftDBError.objectAlreadyExists
+        }
+        
         print("Inserted new data into \(tableName)")
         table.content.append(object)
+    }
+    
+    func delete<T: SwiftDBModel>(object: T, from tableName: String) throws {
+        guard let table = (self.tables.filter{ $0.name == tableName }.first) else {
+            throw SwiftDBError.tableNotExists(name: tableName)
+        }
+        guard table.dataTypeMatch(type: T.self) else {
+            throw SwiftDBError.invalidObjectType(givenType: T.self, expectedType: table.dataType)
+        }
+        
+        table.content = table.content.filter { $0.uniqueID != object.uniqueID }
+    }
+    
+    func select<T: SwiftDBModel>(from tableName: String) throws -> [T]  {
+        guard let table = (self.tables.filter{ $0.name == tableName }.first) else {
+            throw SwiftDBError.tableNotExists(name: tableName)
+        }
+        guard table.dataTypeMatch(type: T.self) else {
+            throw SwiftDBError.invalidObjectType(givenType: T.self, expectedType: table.dataType)
+        }
+        return (table.content as? [T]) ?? []
+        
     }
 }

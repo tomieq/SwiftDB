@@ -58,6 +58,12 @@ do {
     try db.insert(object: user2, into: "users")
     try db.insert(object: car, into: "cars")
     try db.insert(object: bus, into: "buses")
+    
+    var cars: [Car] = try db.select(from: "cars")
+    print("car.color=\(cars.first?.color)")
+    try db.delete(object: car, from: "cars")
+    cars = try db.select(from: "cars")
+    print("car.color=\(cars.first?.color)")
     //try db.insert(object: car, into: "users")
 } catch  {
     print("Exception \(error.self), \(error.localizedDescription)")

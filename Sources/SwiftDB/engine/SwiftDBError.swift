@@ -11,6 +11,7 @@ enum SwiftDBError: Error {
     case tableNotExists(name: String)
     case invalidObjectType(givenType: SwiftDBModel.Type, expectedType: String)
     case invalidObjectState(info: String)
+    case objectAlreadyExists
 }
 
 extension SwiftDBError: LocalizedError {
@@ -22,6 +23,8 @@ extension SwiftDBError: LocalizedError {
             return "Expected type is \(expected) but \(given) given"
         case .invalidObjectState(let info):
             return info
+        case .objectAlreadyExists:
+            return "Object with given uniqueID already exists in table"
         }
     }
 }

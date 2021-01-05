@@ -32,6 +32,10 @@ class SwiftDBTable {
         return true
     }
     
+    func objectExists(uniqueID: String, in tableName: String) -> Bool {
+        return self.content.count{ $0.uniqueID == uniqueID } > 0
+    }
+    
     func truncate() {
         self.content = []
     }
