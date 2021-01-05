@@ -21,8 +21,8 @@ class SwiftDBTests: XCTestCase {
         
         do {
             let db = SwiftDB()
-            db.createDatabase(name: "tests")
-            db.createTable(name: "cars", dataType: Car.self)
+            try db.createDatabase(name: "tests")
+            try db.createTable(name: "cars", dataType: Car.self)
             try db.insert(object: car, into: "cars")
             
             let retrievedCars: [Car] = try db.select(from: "cars")
@@ -39,8 +39,8 @@ class SwiftDBTests: XCTestCase {
         
         do {
             let db = SwiftDB()
-            db.createDatabase(name: "tests")
-            db.createTable(name: "buses", dataType: Car.self)
+            try db.createDatabase(name: "tests")
+            try db.createTable(name: "buses", dataType: Car.self)
             try db.insert(object: bus, into: "buses")
             XCTFail("Test should throw because types are different")
             
@@ -65,8 +65,8 @@ class SwiftDBTests: XCTestCase {
         
         do {
             let db = SwiftDB()
-            db.createDatabase(name: "tests")
-            db.createTable(name: "cars", dataType: Car.self)
+            try db.createDatabase(name: "tests")
+            try db.createTable(name: "cars", dataType: Car.self)
             try db.insert(object: audi, into: "cars")
             try db.insert(object: mercedes, into: "cars")
             
@@ -89,8 +89,8 @@ class SwiftDBTests: XCTestCase {
         
         do {
             let db = SwiftDB()
-            db.createDatabase(name: "tests")
-            db.createTable(name: "cars", dataType: Car.self)
+            try db.createDatabase(name: "tests")
+            try db.createTable(name: "cars", dataType: Car.self)
             try db.insert(object: audi, into: "cars")
             try db.insert(object: mercedes, into: "cars")
             
@@ -121,8 +121,8 @@ class SwiftDBTests: XCTestCase {
         
         do {
             let db = SwiftDB()
-            db.createDatabase(name: "tests")
-            db.createTable(name: "garages", dataType: Garage.self)
+            try db.createDatabase(name: "tests")
+            try db.createTable(name: "garages", dataType: Garage.self)
             try db.insert(object: garage, into: "garages")
             
             let garages: [Garage] = try db.select(from: "garages")
