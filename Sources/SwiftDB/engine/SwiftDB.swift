@@ -26,7 +26,7 @@ class SwiftDB {
     func createTable<T: SwiftDBModel>(name: String, dataType: T.Type) {
         let table = SwiftDBTable(name: name, dataType: dataType)
         self.tables.append(table)
-        print("Created new table \(name) for storing \(dataType) objects")
+        print("Created new table \(name) for storing \(dataType) objects with columns \(table.columns.debugDescription)")
     }
     
     func dropTable(name: String) {

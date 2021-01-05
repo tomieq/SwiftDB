@@ -7,10 +7,24 @@
 
 import Foundation
 
-class SwiftDBModel: Codable {
-    var uniqueID: String
+protocol SwiftDBModel: class, Codable {
+    var uniqueID: String { get }
     
-    required init() {
-        self.uniqueID = UUID().uuidString
+    init()
+}
+
+
+extension SwiftDBModel {
+    func getColumns() -> [SwiftDBModelColumn] {
+        var columns = [SwiftDBModelColumn]()
+        
+        let mirror = Mirror(reflecting: self)
+            for child in mirror.children {
+                let dataType = String(describing: type(of: child.value))
+                if let label = child.label {
+                    columns.append(SwiftDBModelColumn(name: label, dataType: dataType))
+                }
+            }
+        return columns
     }
 }

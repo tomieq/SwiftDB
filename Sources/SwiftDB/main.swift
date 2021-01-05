@@ -10,13 +10,26 @@ import Foundation
 print("SwiftDB is going to be created!")
 
 class User: SwiftDBModel {
+    
+    var uniqueID: String
+    
     var id: Int?
     var name: String?
+    
+    required init() {
+        self.uniqueID = UUID().uuidString
+    }
 }
 
 class Car: SwiftDBModel {
+    var uniqueID: String
+    
     var id: Int?
     var color: String?
+    
+    required init() {
+        self.uniqueID = UUID().uuidString
+    }
 }
 
 let db = SwiftDB()
@@ -38,7 +51,7 @@ do {
     try db.insert(object: user2, into: "users")
     print("id=\(user2.id)")
     try db.insert(object: car, into: "cars")
-    try db.insert(object: car, into: "users")
+    //try db.insert(object: car, into: "users")
 } catch  {
     print("Exception \(error.self), \(error.localizedDescription)")
 }

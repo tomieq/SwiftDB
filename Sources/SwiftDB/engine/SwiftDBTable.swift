@@ -13,27 +13,12 @@ class SwiftDBTable {
     let columns: [SwiftDBModelColumn]
     var content: [SwiftDBModel] = []
     
-    init(name: String, dataType: SwiftDBModel.Type) {
+    init<T: SwiftDBModel>(name: String, dataType: T.Type) {
         self.name = name
         self.dataType = String(describing: dataType)
         
-        
-        do {
-            let sampleObject = dataType.init()
-            let jsonEncoder = JSONEncoder()
-            let data = try jsonEncoder.encode(sampleObject)
-            if let dict = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String: AnyObject] {
-            
-                for (label, value) in dict {
-                    
-                    print("label=\(label) type =\(type(of: value))")
-                }
-            }
-            self.columns = []
-        } catch {
-            self.columns = []
-            print("Something went wrong")
-        }
+        let sampleObject = dataType.init()
+        self.columns = sampleObject.getColumns()
     }
     
     func dataTypeMatch(type: SwiftDBModel.Type) -> Bool {
