@@ -32,10 +32,15 @@ class Car: SwiftDBModel {
     }
 }
 
+class Bus: Car {
+    var doorAmount: Int?
+}
+
 let db = SwiftDB()
 db.createDatabase(name: "test")
 db.createTable(name: "users", dataType: User.self)
 db.createTable(name: "cars", dataType: Car.self)
+db.createTable(name: "buses", dataType: Bus.self)
 
 var user1 = User()
 user1.name = "John"
@@ -45,12 +50,14 @@ user2.name = "Alice"
 var car = Car()
 car.color = "red"
 
+var bus = Bus()
+bus.doorAmount = 3
+
 do {
     try db.insert(object: user1, into: "users")
-    print("id=\(user1.id)")
     try db.insert(object: user2, into: "users")
-    print("id=\(user2.id)")
     try db.insert(object: car, into: "cars")
+    try db.insert(object: bus, into: "buses")
     //try db.insert(object: car, into: "users")
 } catch  {
     print("Exception \(error.self), \(error.localizedDescription)")

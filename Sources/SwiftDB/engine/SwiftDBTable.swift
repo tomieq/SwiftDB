@@ -22,7 +22,14 @@ class SwiftDBTable {
     }
     
     func dataTypeMatch(type: SwiftDBModel.Type) -> Bool {
-        return String(describing: type) == self.dataType
+        let sampleObject = type.init()
+        if String(describing: type) != self.dataType {
+            return false
+        }
+        if self.columns != sampleObject.getColumns() {
+            return false
+        }
+        return true
     }
     
     func truncate() {

@@ -17,3 +17,15 @@ extension SwiftDBModelColumn: CustomDebugStringConvertible {
         return "\(self.name)(\(self.dataType))"
     }
 }
+
+extension SwiftDBModelColumn: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        if lhs.name != rhs.name {
+            return false
+        }
+        if lhs.dataType != rhs.dataType {
+            return false
+        }
+        return true
+    }
+}
