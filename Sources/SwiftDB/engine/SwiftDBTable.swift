@@ -39,4 +39,15 @@ class SwiftDBTable {
     func truncate() {
         self.content = []
     }
+    
+    func filteredContent<T: Equatable>(content: [SwiftDBModelWrap], attribute: String, value: T) -> [SwiftDBModelWrap] {
+        return self.content.filter { wrap in
+            if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
+               if let objectValue = metaData.value as? T, objectValue == value {
+                   return true
+               }
+            }
+            return false
+        }
+    }
 }

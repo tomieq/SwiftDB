@@ -104,43 +104,22 @@ class SwiftDB {
         guard table.dataTypeMatch(type: T.self) else {
             throw SwiftDBError.invalidObjectType(givenType: T.self, expectedType: table.dataType)
         }
-        var wraps = table.content
+        var content = table.content
         if let query = query {
             switch query {
             case .equalsString(let attribute, let value):
-                wraps = wraps.filter { wrap in
-                    if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
-                        if let objectValue = metaData.value as? String, objectValue == value {
-                            return true
-                        }
-                    }
-                    return false
-                }
+                content = table.filteredContent(content: content, attribute: attribute, value: value)
             case .equalsInt(let attribute, let value):
-                wraps = wraps.filter { wrap in
-                    if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
-                        if let objectValue = metaData.value as? Int, objectValue == value {
-                            return true
-                        }
-                    }
-                    return false
-                }
+                content = table.filteredContent(content: content, attribute: attribute, value: value)
             case .equalsBool(let attribute, let value):
-                wraps = wraps.filter { wrap in
-                    if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
-                        if let objectValue = metaData.value as? Bool, objectValue == value {
-                            return true
-                        }
-                    }
-                    return false
-                }
+                content = table.filteredContent(content: content, attribute: attribute, value: value)
             case .or(_):
                 break
             case .and(_):
                 break
             }
         }
-        return (wraps.map { $0.model } as? [T]) ?? []
+        return (content.map { $0.model } as? [T]) ?? []
         
     }
     
