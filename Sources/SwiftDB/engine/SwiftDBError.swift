@@ -8,6 +8,7 @@
 import Foundation
 
 enum SwiftDBError: Error {
+    case databaseNotSelected
     case tableNotExists(name: String)
     case invalidObjectType(givenType: SwiftDBModel.Type, expectedType: String)
     case invalidObjectState(info: String)
@@ -17,6 +18,8 @@ enum SwiftDBError: Error {
 extension SwiftDBError: LocalizedError {
     public var errorDescription: String? {
         switch self {
+        case .databaseNotSelected:
+            return "Choose database first"
         case .tableNotExists(let name):
             return "Table \(name) does not exists"
         case .invalidObjectType(let given, let expected):
