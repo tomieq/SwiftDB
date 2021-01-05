@@ -33,6 +33,10 @@ class SwiftDB {
         self.tables = []
     }
     
+    private func getTable(named name: String) -> SwiftDBTable? {
+        return self.tables.filter{ $0.name == name }.first
+    }
+    
     func createTable<T: SwiftDBModel>(name: String, dataType: T.Type) throws {
         guard let _ = self.databaseName else {
             throw SwiftDBError.databaseNotSelected
@@ -53,7 +57,7 @@ class SwiftDB {
         guard let _ = self.databaseName else {
             throw SwiftDBError.databaseNotSelected
         }
-        guard let table = (self.tables.filter{ $0.name == name }.first) else {
+        guard let table = self.getTable(named: name) else {
             throw SwiftDBError.tableNotExists(name: name)
         }
         table.truncate()
@@ -63,7 +67,7 @@ class SwiftDB {
         guard let _ = self.databaseName else {
             throw SwiftDBError.databaseNotSelected
         }
-        guard let table = (self.tables.filter{ $0.name == tableName }.first) else {
+        guard let table = self.getTable(named: tableName) else {
             throw SwiftDBError.tableNotExists(name: tableName)
         }
         guard table.dataTypeMatch(type: T.self) else {
@@ -92,7 +96,7 @@ class SwiftDB {
         guard let _ = self.databaseName else {
             throw SwiftDBError.databaseNotSelected
         }
-        guard let table = (self.tables.filter{ $0.name == tableName }.first) else {
+        guard let table = self.getTable(named: tableName) else {
             throw SwiftDBError.tableNotExists(name: tableName)
         }
         guard table.dataTypeMatch(type: T.self) else {
@@ -107,7 +111,7 @@ class SwiftDB {
         guard let _ = self.databaseName else {
             throw SwiftDBError.databaseNotSelected
         }
-        guard let table = (self.tables.filter{ $0.name == tableName }.first) else {
+        guard let table = self.getTable(named: tableName) else {
             throw SwiftDBError.tableNotExists(name: tableName)
         }
         guard table.dataTypeMatch(type: T.self) else {
