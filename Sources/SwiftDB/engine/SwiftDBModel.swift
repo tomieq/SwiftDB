@@ -18,13 +18,16 @@ extension SwiftDBModel {
     func getColumns() -> [SwiftDBModelColumn] {
         var columns = [SwiftDBModelColumn]()
         
-        let mirror = Mirror(reflecting: self)
-            for child in mirror.children {
+        var mirror: Mirror? = Mirror(reflecting: self)
+        while mirror != nil {
+            mirror?.children.forEach { child in
                 let dataType = String(describing: type(of: child.value))
                 if let label = child.label {
                     columns.append(SwiftDBModelColumn(name: label, dataType: dataType))
                 }
             }
+            mirror = mirror?.superclassMirror
+        }
         return columns
     }
 }
