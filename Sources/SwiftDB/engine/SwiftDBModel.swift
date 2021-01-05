@@ -7,6 +7,10 @@
 
 import Foundation
 
-protocol SwiftDBModel: class, Codable {
-    var id: Int? { get set }
+class SwiftDBModel: Codable {
+    var uniqueID: String
+    
+    required init() {
+        self.uniqueID = UUID().uuidString
+    }
 }
