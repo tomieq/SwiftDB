@@ -75,7 +75,7 @@ class SwiftDB {
         }
         
         print("Inserted new data into \(tableName)")
-        table.content.append(object)
+        table.content.append(SwiftDBModelWrap(object))
         
         try self.save(table: table, dataType: T.self)
     }
@@ -89,7 +89,7 @@ class SwiftDB {
             throw SwiftDBError.invalidObjectType(givenType: T.self, expectedType: table.dataType)
         }
         
-        table.content = table.content.filter { $0.uniqueID != object.uniqueID }
+        table.content = table.content.filter { $0.model.uniqueID != object.uniqueID }
         print("Deleted object from \(tableName) with uniqueID=\(object.uniqueID)")
         try self.save(table: table, dataType: T.self)
     }
@@ -102,7 +102,7 @@ class SwiftDB {
         guard table.dataTypeMatch(type: T.self) else {
             throw SwiftDBError.invalidObjectType(givenType: T.self, expectedType: table.dataType)
         }
-        return (table.content as? [T]) ?? []
+        return (table.content.map { $0.model } as? [T]) ?? []
         
     }
     

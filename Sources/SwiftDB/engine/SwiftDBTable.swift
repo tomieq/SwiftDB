@@ -11,7 +11,7 @@ class SwiftDBTable {
     let name: String
     let dataType: String
     let columns: [SwiftDBModelColumn]
-    var content: [SwiftDBModel] = []
+    var content: [SwiftDBModelWrap] = []
     
     init<T: SwiftDBModel>(name: String, dataType: T.Type) {
         self.name = name
@@ -33,7 +33,7 @@ class SwiftDBTable {
     }
     
     func objectExists(uniqueID: String, in tableName: String) -> Bool {
-        return self.content.count{ $0.uniqueID == uniqueID } > 0
+        return self.content.count{ $0.model.uniqueID == uniqueID } > 0
     }
     
     func truncate() {

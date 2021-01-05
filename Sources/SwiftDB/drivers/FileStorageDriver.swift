@@ -29,7 +29,7 @@ class FileStorageDriver: StorageDriver {
     }
     
     func save<T: SwiftDBModel>(table: SwiftDBTable, dataType: T.Type) throws {
-        if let encodable = table.content as? [T] {
+        if let encodable = (table.content.map { $0.model }) as? [T] {
             do {
                 var url = self.rootUrl
                 url.appendPathComponent("\(table.name).json")
