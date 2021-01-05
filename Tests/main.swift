@@ -53,4 +53,56 @@ class SwiftDBTests: XCTestCase {
             }
         }
     }
+    
+    func testSelectAll() {
+        let audi = Car()
+        audi.color = "black"
+        audi.fuelLevel = 50
+        
+        let mercedes = Car()
+        mercedes.color = "silver"
+        mercedes.fuelLevel = 90
+        
+        do {
+            let db = SwiftDB()
+            db.createDatabase(name: "tests")
+            db.createTable(name: "cars", dataType: Car.self)
+            try db.insert(object: audi, into: "cars")
+            try db.insert(object: mercedes, into: "cars")
+            
+            let retrievedCars: [Car] = try db.select(from: "cars")
+            XCTAssertEqual(retrievedCars.count, 2)
+        } catch {
+            XCTFail("Test should not throw")
+        }
+    }
+    
+    func testDeleteSingle() {
+        
+        let audi = Car()
+        audi.color = "black"
+        audi.fuelLevel = 50
+        
+        let mercedes = Car()
+        mercedes.color = "silver"
+        mercedes.fuelLevel = 90
+        
+        do {
+            let db = SwiftDB()
+            db.createDatabase(name: "tests")
+            db.createTable(name: "cars", dataType: Car.self)
+            try db.insert(object: audi, into: "cars")
+            try db.insert(object: mercedes, into: "cars")
+            
+            var retrievedCars: [Car] = try db.select(from: "cars")
+            XCTAssertEqual(retrievedCars.count, 2)
+            
+            try db.delete(object: mercedes, from: "cars")
+            
+            retrievedCars = try db.select(from: "cars")
+            XCTAssertEqual(retrievedCars.count, 1)
+        } catch {
+            XCTFail("Test should not throw")
+        }
+    }
 }

@@ -66,6 +66,7 @@ class SwiftDB {
         }
         
         table.content = table.content.filter { $0.uniqueID != object.uniqueID }
+        print("Deleted object from \(tableName) with uniqueID=\(object.uniqueID)")
     }
     
     func select<T: SwiftDBModel>(from tableName: String) throws -> [T]  {
