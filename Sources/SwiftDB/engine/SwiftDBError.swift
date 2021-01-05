@@ -9,7 +9,7 @@ import Foundation
 
 enum SwiftDBError: Error {
     case tableNotExists(name: String)
-    case invalidObjectType(given: SwiftDBModel.Type, expected: SwiftDBModel.Type)
+    case invalidObjectType(givenType: SwiftDBModel.Type, expectedType: String)
     case invalidObjectState(info: String)
 }
 

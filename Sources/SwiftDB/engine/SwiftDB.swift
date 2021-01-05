@@ -14,10 +14,13 @@ class SwiftDB {
     
     func createDatabase(name: String) {
         self.databaseName = name
+        self.tables = []
     }
     
     func useDatabase(name: String) {
         self.databaseName = name
+        // load tables into memory
+        self.tables = []
     }
     
     func createTable<T: SwiftDBModel>(name: String, dataType: T.Type) {
@@ -42,9 +45,8 @@ class SwiftDB {
         guard let table = (self.tables.filter{ $0.name == tableName }.first) else {
             throw SwiftDBError.tableNotExists(name: tableName)
         }
-        let expectedModel = table.dataType
-        guard T.self == expectedModel else {
-            throw SwiftDBError.invalidObjectType(given: T.self, expected: expectedModel)
+        guard table.dataTypeMatch(type: T.self) else {
+            throw SwiftDBError.invalidObjectType(givenType: T.self, expectedType: table.dataType)
         }
         
         guard object.id == .none else {
