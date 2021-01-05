@@ -94,7 +94,7 @@ class SwiftDB {
         try self.save(table: table, dataType: T.self)
     }
     
-    func select<T: SwiftDBModel>(from tableName: String) throws -> [T]  {
+    func select<T: SwiftDBModel>(from tableName: String, where query: SwiftDBQuery? = nil) throws -> [T]  {
 
         guard let table = self.getTable(named: tableName) else {
             throw SwiftDBError.tableNotExists(name: tableName)
@@ -102,7 +102,25 @@ class SwiftDB {
         guard table.dataTypeMatch(type: T.self) else {
             throw SwiftDBError.invalidObjectType(givenType: T.self, expectedType: table.dataType)
         }
-        return (table.content.map { $0.model } as? [T]) ?? []
+        var wraps = table.content
+        if let query = query {
+            switch query {
+            case .equals(let columnName, let value):
+                wraps = wraps.filter { wrap in
+                    if let metaData = (wrap.metaData.filter { $0.name == columnName }.first) {
+                        if metaData.value == value {
+                            return true
+                        }
+                    }
+                    return false
+                }
+            case .or(_):
+                break
+            case .and(_):
+                break
+            }
+        }
+        return (wraps.map { $0.model } as? [T]) ?? []
         
     }
     
