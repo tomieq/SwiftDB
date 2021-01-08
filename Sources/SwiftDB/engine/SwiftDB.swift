@@ -77,7 +77,7 @@ class SwiftDB {
         }
         
         print("Inserted new data into \(tableName)")
-        table.content.append(SwiftDBModelWrap(object))
+        try table.content.append(SwiftDBModelWrap(self.makeCopy(object)))
         
         try self.save(table: table, dataType: T.self)
     }
@@ -106,24 +106,45 @@ class SwiftDB {
         }
         var content = table.content
         if let query = query {
-            switch query {
-            case .equalsString(let attribute, let value):
-                content = table.filteredContent(content: content, attribute: attribute, value: value)
-            case .equalsInt(let attribute, let value):
-                content = table.filteredContent(content: content, attribute: attribute, value: value)
-            case .equalsBool(let attribute, let value):
-                content = table.filteredContent(content: content, attribute: attribute, value: value)
-            case .or(_):
-                break
-            case .and(_):
-                break
-            }
+            content = try self.filterResults(content, where: query)
         }
-        return (content.map { $0.model } as? [T]) ?? []
+        let objects = (content.map { $0.model } as? [T]) ?? []
+        let copiedObjects = try objects.map { try self.makeCopy($0) }
+        return copiedObjects
         
+    }
+    
+    private func filterResults(_ data: [SwiftDBModelWrap], where query: SwiftDBQuery) throws -> [SwiftDBModelWrap] {
+        switch query {
+            case .equalsString(let attribute, let value):
+                return SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+            case .equalsInt(let attribute, let value):
+                return SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+            case .equalsBool(let attribute, let value):
+                return SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+            case .or(let subqueries):
+                var outputData: [SwiftDBModelWrap] = []
+                try subqueries.forEach { subquery in
+                    let objects = try self.filterResults(data, where: subquery)
+                    objects.forEach { outputData.appendUnique($0) }
+                    
+                }
+                return outputData
+            case .and(_):
+                return []
+        }
     }
     
     private func save<T: SwiftDBModel>(table: SwiftDBTable, dataType: T.Type) throws {
         try self.storageDriver.save(table: table, dataType: dataType)
+    }
+    
+    private func makeCopy<T: SwiftDBModel>(_ original: T) throws -> T {
+        
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(original)
+        let decoder = JSONDecoder()
+        let copy = try decoder.decode(T.self, from: data)
+        return copy
     }
 }

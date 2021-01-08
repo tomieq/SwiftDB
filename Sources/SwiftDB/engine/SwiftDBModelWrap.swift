@@ -7,6 +7,12 @@
 
 import Foundation
 
+
+struct SwiftDBModelMetaData {
+    let name: String
+    let value: Any
+}
+
 class SwiftDBModelWrap {
     let model: SwiftDBModel
     var metaData: [SwiftDBModelMetaData] = []
@@ -44,7 +50,8 @@ class SwiftDBModelWrap {
     }
 }
 
-struct SwiftDBModelMetaData {
-    let name: String
-    let value: Any
+extension SwiftDBModelWrap: Equatable {
+    static func == (lhs: SwiftDBModelWrap, rhs: SwiftDBModelWrap) -> Bool {
+        return lhs.model.uniqueID == rhs.model.uniqueID
+    }
 }

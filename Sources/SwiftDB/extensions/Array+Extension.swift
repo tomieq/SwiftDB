@@ -58,3 +58,15 @@ extension Array {
         }
     }
 }
+
+
+extension Array where Element: Equatable {
+
+    mutating func appendUnique(_ element: Element) {
+        if let index = firstIndex(of: element) {
+            return
+        } else {
+            append(element)
+        }
+    }
+}

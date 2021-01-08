@@ -165,20 +165,93 @@ class SwiftDBTests: XCTestCase {
             try db.insert(object: audi, into: "cars")
             try db.insert(object: mercedes, into: "cars")
             
-            var cars: [Car] = try db.select(from: "cars", where: SwiftDBQuery.equalsString(attribute: "color", value: "silver"))
+            var cars: [Car] = try db.select(from: "cars", where: .equalsString(attribute: "color", value: "silver"))
             XCTAssertEqual(cars.count, 1)
             XCTAssertNotNil(cars.first)
             XCTAssertEqual("silver", cars.first?.color)
             
-            cars = try db.select(from: "cars", where: SwiftDBQuery.equalsInt(attribute: "fuelLevel", value: 90))
+            cars = try db.select(from: "cars", where: .equalsInt(attribute: "fuelLevel", value: 90))
             XCTAssertEqual(cars.count, 1)
             XCTAssertNotNil(cars.first)
             XCTAssertEqual(90, cars.first?.fuelLevel)
             
-            cars = try db.select(from: "cars", where: SwiftDBQuery.equalsBool(attribute: "isOpen", value: true))
+            cars = try db.select(from: "cars", where: .equalsBool(attribute: "isOpen", value: true))
             XCTAssertEqual(cars.count, 1)
             XCTAssertNotNil(cars.first)
             XCTAssertEqual(true, cars.first?.isOpen)
+        } catch {
+            XCTFail("Test should not throw")
+        }
+    }
+    
+    func testModifyinigInsertedObject() {
+        let car = Car()
+        car.color = "red"
+        car.fuelLevel = 50
+        
+        do {
+            let db = try SwiftDB(databaseName: "tests")
+            try db.createTable(name: "cars", dataType: Car.self)
+            try db.insert(object: car, into: "cars")
+            
+            car.fuelLevel = 10
+            
+            var cars: [Car] = try db.select(from: "cars")
+            XCTAssertEqual(cars.count, 1)
+            var retrievedCar = cars.first
+            XCTAssertEqual(retrievedCar?.fuelLevel, 50)
+            
+            retrievedCar?.fuelLevel = 100
+            
+            cars = try db.select(from: "cars")
+            XCTAssertEqual(cars.count, 1)
+            retrievedCar = cars.first
+            XCTAssertEqual(retrievedCar?.fuelLevel, 50)
+        } catch {
+            XCTFail("Test should not throw")
+        }
+    }
+    
+    func testOrQuery() {
+        let audi = Car()
+        audi.color = "black"
+        audi.fuelLevel = 50
+        audi.isOpen = false
+        
+        let mercedes = Car()
+        mercedes.color = "silver"
+        mercedes.fuelLevel = 90
+        mercedes.isOpen = true
+        
+        let toyota = Car()
+        toyota.color = "red"
+        toyota.fuelLevel = 90
+        
+        let mazda = Car()
+        mazda.color = "blue"
+        mazda.fuelLevel = 90
+        
+        do {
+            let db = try SwiftDB(databaseName: "tests")
+            try db.createTable(name: "cars", dataType: Car.self)
+            try db.insert(object: audi, into: "cars")
+            try db.insert(object: mercedes, into: "cars")
+            try db.insert(object: toyota, into: "cars")
+            try db.insert(object: mazda, into: "cars")
+            
+            var cars: [Car] = try db.select(from: "cars", where: .or([
+                .equalsString(attribute: "color", value: "silver"),
+                .equalsInt(attribute: "fuelLevel", value: 90)
+            ]))
+            XCTAssertEqual(cars.count, 3)
+            
+            
+            
+            cars = try db.select(from: "cars", where: .or([
+                .equalsString(attribute: "color", value: "black"),
+                .equalsString(attribute: "color", value: "red")
+            ]))
+            XCTAssertEqual(cars.count, 2)
         } catch {
             XCTFail("Test should not throw")
         }
