@@ -13,6 +13,7 @@ enum SwiftDBError: Error {
     case invalidObjectType(givenType: SwiftDBModel.Type, expectedType: String)
     case invalidObjectState(info: String)
     case objectAlreadyExists
+    case queryError(info: String)
 }
 
 extension SwiftDBError: LocalizedError {
@@ -28,6 +29,8 @@ extension SwiftDBError: LocalizedError {
             return info
         case .objectAlreadyExists:
             return "Object with given uniqueID already exists in table"
+        case .queryError(let info):
+            return "Query error: \(info)"
         }
     }
 }

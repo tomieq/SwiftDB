@@ -40,12 +40,15 @@ class SwiftDBTable {
         self.content = []
     }
     
-    class func filterContent<T: Equatable>(content: [SwiftDBModelWrap], attribute: String, value: T) -> [SwiftDBModelWrap] {
-        return content.filter { wrap in
+    class func filterContent<T: Equatable>(content: [SwiftDBModelWrap], attribute: String, value: T) throws -> [SwiftDBModelWrap] {
+        return try content.filter { wrap in
             if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
-               if let objectValue = metaData.value as? T, objectValue == value {
-                   return true
-               }
+                guard let objectValue = metaData.value as? T else {
+                    throw SwiftDBError.queryError(info: "Attribute \(attribute) is not a \(T.self) type.")
+                }
+                if objectValue == value {
+                    return true
+                }
             }
             return false
         }

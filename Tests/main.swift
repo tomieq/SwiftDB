@@ -303,4 +303,33 @@ class SwiftDBTests: XCTestCase {
             XCTFail("Test should not throw")
         }
     }
+    
+    func testInvalidQueryType() {
+        
+        let audi = Car()
+        audi.color = "black"
+        audi.fuelLevel = 50
+        
+        let mercedes = Car()
+        mercedes.color = "silver"
+        mercedes.fuelLevel = 90
+        
+        do {
+            let db = try SwiftDB(databaseName: "tests")
+            try db.createTable(name: "cars", dataType: Car.self)
+            try db.insert(object: audi, into: "cars")
+            try db.insert(object: mercedes, into: "cars")
+            
+            let _: [Car] = try db.select(from: "cars", where: .equals("fuelLevel", toString: "90"))
+            
+            XCTFail("Test should throw")
+        } catch {
+            print(error.localizedDescription)
+            if case SwiftDBError.queryError(_) = error {
+                
+            } else {
+                XCTFail("Invalid exception \(error)")
+            }
+        }
+    }
 }

@@ -109,11 +109,11 @@ class SwiftDB {
     private func filterResults(_ data: [SwiftDBModelWrap], where query: SwiftDBQuery) throws -> [SwiftDBModelWrap] {
         switch query {
             case .equalsString(let attribute, let value):
-                return SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+                return try SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
             case .equalsInt(let attribute, let value):
-                return SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+                return try SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
             case .equalsBool(let attribute, let value):
-                return SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+                return try SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
             case .or(let subqueries):
                 var outputData: [SwiftDBModelWrap] = []
                 try subqueries.forEach { subquery in
