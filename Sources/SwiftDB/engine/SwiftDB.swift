@@ -98,7 +98,7 @@ class SwiftDB {
         }
         var content = table.content
         if let query = query {
-            content = try self.filterResults(content, where: query)
+            content = try self.filterResults(table, where: query)
         }
         let objects = (content.map { $0.model } as? [T]) ?? []
         let copiedObjects = try objects.map { try self.makeCopy($0) }
@@ -106,25 +106,25 @@ class SwiftDB {
         
     }
     
-    private func filterResults(_ data: [SwiftDBModelWrap], where query: SwiftDBQuery) throws -> [SwiftDBModelWrap] {
+    private func filterResults(_ table: SwiftDBTable, where query: SwiftDBQuery) throws -> [SwiftDBModelWrap] {
         switch query {
             case .equalsString(let attribute, let value):
-                return try SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+                return try table.filterContent(content: table.content, attribute: attribute, value: value)
             case .equalsInt(let attribute, let value):
-                return try SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+                return try table.filterContent(content: table.content, attribute: attribute, value: value)
             case .equalsBool(let attribute, let value):
-                return try SwiftDBTable.filterContent(content: data, attribute: attribute, value: value)
+                return try table.filterContent(content: table.content, attribute: attribute, value: value)
             case .or(let subqueries):
                 var outputData: [SwiftDBModelWrap] = []
                 try subqueries.forEach { subquery in
-                    let objects = try self.filterResults(data, where: subquery)
+                    let objects = try self.filterResults(table, where: subquery)
                     objects.forEach { outputData.appendUnique($0) }
                     
                 }
                 return outputData
             case .and(let subqueries):
                 var outputData: [SwiftDBModelWrap] = []
-                let subsets = try subqueries.map {  try self.filterResults(data, where: $0) }
+                let subsets = try subqueries.map {  try self.filterResults(table, where: $0) }
                 var uniqueResults: [SwiftDBModelWrap] = []
                 subsets.flatMap { $0 }.forEach { uniqueResults.appendUnique($0) }
                 uniqueResults.forEach { candidate in

@@ -40,7 +40,7 @@ class SwiftDBTable {
         self.content = []
     }
     
-    class func filterContent<T: Equatable>(content: [SwiftDBModelWrap], attribute: String, value: T) throws -> [SwiftDBModelWrap] {
+    func filterContent<T: Equatable>(content: [SwiftDBModelWrap], attribute: String, value: T) throws -> [SwiftDBModelWrap] {
         return try content.filter { wrap in
             if let metaData = (wrap.metaData.filter { $0.name == attribute }.first) {
                 guard let objectValue = metaData.value as? T else {
@@ -48,6 +48,10 @@ class SwiftDBTable {
                 }
                 if objectValue == value {
                     return true
+                }
+            } else {
+                guard (self.columns.contains { $0.name == attribute })  else {
+                    throw SwiftDBError.queryError(info: "Unknown attribute \(attribute).")
                 }
             }
             return false
