@@ -130,8 +130,18 @@ class SwiftDB {
                     
                 }
                 return outputData
-            case .and(_):
-                return []
+            case .and(let subqueries):
+                var outputData: [SwiftDBModelWrap] = []
+                let subsets = try subqueries.map {  try self.filterResults(data, where: $0) }
+                var uniqueResults: [SwiftDBModelWrap] = []
+                subsets.flatMap { $0 }.forEach { uniqueResults.appendUnique($0) }
+                uniqueResults.forEach { candidate in
+                    let n = subsets.count { $0.contains(candidate) }
+                    if subsets.count == n {
+                        outputData.appendUnique(candidate)
+                    }
+                }
+                return outputData
         }
     }
     
