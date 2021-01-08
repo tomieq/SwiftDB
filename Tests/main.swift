@@ -240,16 +240,16 @@ class SwiftDBTests: XCTestCase {
             try db.insert(object: mazda, into: "cars")
             
             var cars: [Car] = try db.select(from: "cars", where: .or([
-                .equalsString(attribute: "color", value: "silver"),
-                .equalsInt(attribute: "fuelLevel", value: 90)
+                .equals("color", toString: "silver"),
+                .equals("fuelLevel", toInt: 90)
             ]))
             XCTAssertEqual(cars.count, 3)
             
             
             
             cars = try db.select(from: "cars", where: .or([
-                .equalsString(attribute: "color", value: "black"),
-                .equalsString(attribute: "color", value: "red")
+                .equals("color", toString: "black"),
+                .equals("color", toString: "red")
             ]))
             XCTAssertEqual(cars.count, 2)
         } catch {
@@ -286,16 +286,16 @@ class SwiftDBTests: XCTestCase {
             try db.insert(object: mazda, into: "cars")
             
             var cars: [Car] = try db.select(from: "cars", where: .and([
-                .equalsString(attribute: "color", value: "silver"),
-                .equalsInt(attribute: "fuelLevel", value: 90)
+                .equals("color", toString: "silver"),
+                .equals("fuelLevel", toInt: 90)
             ]))
             XCTAssertEqual(cars.count, 1)
             XCTAssertEqual(cars.first?.fuelLevel, 90)
             
             
             cars = try db.select(from: "cars", where: .and([
-                .equalsString(attribute: "color", value: "silver"),
-                .equalsInt(attribute: "fuelLevel", value: 50)
+                .equals("color", toString: "silver"),
+                .equals("fuelLevel", toInt: 50)
             ]))
             XCTAssertEqual(cars.count, 0)
             

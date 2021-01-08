@@ -12,14 +12,6 @@ enum SwiftDBType {
     case fileStorage(path: String)
 }
 
-enum SwiftDBQuery {
-    case equalsString(attribute: String, value: String)
-    case equalsInt(attribute: String, value: Int)
-    case equalsBool(attribute: String, value: Bool)
-    case or([SwiftDBQuery])
-    case and([SwiftDBQuery])
-}
-
 class SwiftDB {
 
     private var databaseName: String
